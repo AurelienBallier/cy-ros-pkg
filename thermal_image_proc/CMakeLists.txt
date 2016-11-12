@@ -5,9 +5,11 @@ find_package(catkin REQUIRED COMPONENTS cv_bridge dynamic_reconfigure image_tran
 find_package(OpenCV REQUIRED)
 
 catkin_package(
-  LIBRARIES ${PROJECT_NAME})
+  LIBRARIES ${PROJECT_NAME}
+  DEPENDS opencv2
+  )
 
-include_directories(${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
+include_directories(${catkin_INCLUDE_DIRS})
 
 ## Declare a cpp executable
 add_executable(thermal_image_proc_node src/thermal_image_proc.cpp)
