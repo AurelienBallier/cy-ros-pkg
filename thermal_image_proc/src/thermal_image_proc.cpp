@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2012, Ye Cheng
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -40,9 +40,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/contrib/contrib.hpp>
 #include <dynamic_reconfigure/server.h>
-//#include <thermal_image_proc/FlirConfig.h>
 
 
 namespace enc = sensor_msgs::image_encodings;
@@ -62,7 +60,7 @@ public:
     int interest_y;
     int interest_x;
 
-    ImageConverter():   
+    ImageConverter():
         it_(nh_)
     {
         image_pub_ = it_.advertise("out", 1);
@@ -105,21 +103,21 @@ public:
         pixel_val_ = cv_ptr_->image.at<unsigned short>(interest_y,interest_x);
         temp_msg_.data = (float)(pixel_val_ / 10.0f) - 273.15f;
 
-        
+
         for( int y = 0; y < cv_ptr_->image.rows; y++ )
-        { 
+        {
             for( int x = 0; x < cv_ptr_->image.cols ; x++ )
-            { 
+            {
                 if (cv_ptr_->image.at<unsigned short>(y,x) < minpix) minpix = cv_ptr_->image.at<unsigned short>(y,x);
                 if (cv_ptr_->image.at<unsigned short>(y,x) > maxpix) maxpix = cv_ptr_->image.at<unsigned short>(y,x);
             }
         }
-    
+
         float span = (float)(maxpix - minpix + 1);
         for( int y = 0; y < cv_ptr_->image.rows; y++ )
-        { 
+        {
             for( int x = 0; x < cv_ptr_->image.cols ; x++ )
-            { 
+            {
                 gray_img_.at<uchar>(y,x) = cv::saturate_cast<uchar>(((cv_ptr_->image.at<unsigned short>(y,x) - minpix) / span) * 0xFF);
 
             }
@@ -130,7 +128,7 @@ public:
         cv::circle(cv_ptr_->image, cv::Point(interest_y, interest_x), 5, CV_RGB(255,255,255));
         cv::imshow(WINDOW, cv_ptr_->image);
         cv::waitKey(3);
-    
+
         //temp_pub_.publish(temp_msg_);
         image_pub_.publish(cv_ptr_->toImageMsg());
     }
@@ -149,4 +147,3 @@ int main(int argc, char** argv)
     ros::spin();
     return 0;
 }
-
